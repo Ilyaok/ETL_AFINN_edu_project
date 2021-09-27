@@ -11,10 +11,8 @@ con = sqlite3.connect('tweets.db')
 cur = con.cursor()
 
 def check_exists(l, val):
-    if val is None:
-        l.append(None)
-    else:
-        l.append(val)
+    pass
+
 
 
 # В условии задачи не уточнено, что делать с твитами в статусе 'delete'
