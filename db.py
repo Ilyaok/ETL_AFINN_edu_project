@@ -10,46 +10,76 @@ with open('three_minutes_tweets.json') as f:
 con = sqlite3.connect('tweets.db')
 cur = con.cursor()
 
-def check_exists(l, val):
-    pass
-
-
-
 # В условии задачи не уточнено, что делать с твитами в статусе 'delete'
 # Принято решение не загружать такие твиты в БД
+#todo оптимизировать ситуацию с else
 for line in data:
     if 'delete' not in line.keys():
         line_to_db = []
+
         line_to_db.append(line['id'])
-        check_exists(line_to_db, line['user']['name'])
-        check_exists(line_to_db, line['text'])
-        check_exists(line_to_db, line['place']['country_code'])
-        check_exists(line_to_db, line['entities']['urls'][0]['display_url'])
-        check_exists(line_to_db, line['lang'])
-        check_exists(line_to_db, line['created_at'])
-        check_exists(line_to_db, line['user']['location'])
-        print(line_to_db)
 
-#todo проверить кодировку
-cur.execute('INSERT INTO tweets_test '
-            '(id, name, tweet_text, country_code, display_url, lang, created_at, location, tweet_sentiment)'
-            'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            (data[4]['id'],
-             data[4]['user']['name'],
-             data[4]['text'],
-             data[117]['place']['country_code'],
-             data[21]['entities']['urls'][0]['display_url'], #data[4]['entities']['media'][0]['indices']['display_url'],
-             data[4]['lang'],
-             data[4]['created_at'],
-             data[4]['user']['location'],
-             0))
+        if line['user']:
+            if line['user']['name']:
+                line_to_db.append(line['user']['name'])
+            else:
+                line_to_db.append(None)
+        else:
+            line_to_db.append(None)
+
+        if line['text']:
+            line_to_db.append(line['text'])
+        else:
+            line_to_db.append(None)
+
+        if line['place']:
+            if line['place']['country_code']:
+                line_to_db.append(line['place']['country_code'])
+            else:
+                line_to_db.append(None)
+        else:
+            line_to_db.append(None)
+
+        if line['entities']:
+            if line['entities']['urls']:
+                if line['entities']['urls'][0]:
+                    if line['entities']['urls'][0]['display_url']:
+                        line_to_db.append(line['entities']['urls'][0]['display_url'])
+                    else:
+                        line_to_db.append(None)
+                else:
+                    line_to_db.append(None)
+            else:
+                line_to_db.append(None)
+        else:
+            line_to_db.append(None)
 
 
-a, b = 111, 222
-d = {1: 'a'}
-l = [123, 456]
-cur.execute('INSERT INTO test VALUES (?, ?)', l)
+        if line['lang']:
+            line_to_db.append(line['lang'])
+        else:
+            line_to_db.append(None)
+
+        if line['created_at']:
+            line_to_db.append(line['created_at'])
+        else:
+            line_to_db.append(None)
+
+        if line['user']:
+            if line['user']['location']:
+                line_to_db.append(line['user']['location'])
+            else:
+                line_to_db.append(None)
+        else:
+            line_to_db.append(None)
+
+        line_to_db.append(0)
+
+        #загрузка в БД
+        cur.execute('INSERT INTO tweets_test3 '
+                    '(id, name, tweet_text, country_code, display_url, lang, created_at, location, tweet_sentiment)'
+                    'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    line_to_db)
 
 con.commit()
-
 con.close()
