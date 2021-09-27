@@ -76,7 +76,7 @@ for line in data:
         line_to_db.append(0)
 
         #загрузка в БД
-        cur.execute('INSERT INTO tweets_test '
+        cur.execute('INSERT INTO tweets_test3 '
                     '(id, name, tweet_text, country_code, display_url, lang, created_at, location, tweet_sentiment)'
                     'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
                     line_to_db)
