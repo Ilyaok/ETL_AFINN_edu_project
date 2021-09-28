@@ -6,13 +6,10 @@ with open('three_minutes_tweets.json') as f:
     for line in f:
         data.append(json.loads(line))
 
-
 con = sqlite3.connect('tweets.db')
 cur = con.cursor()
 
-# В условии задачи не уточнено, что делать с твитами в статусе 'delete'
-# Принято решение не загружать такие твиты в БД
-#todo оптимизировать ситуацию с else
+# todo оптимизировать ситуацию с else (в т.ч. проверить вложенные if)
 for line in data:
     if 'delete' not in line.keys():
         line_to_db = []
@@ -52,7 +49,6 @@ for line in data:
         else:
             line_to_db.append(None)
 
-
         if line['lang']:
             line_to_db.append(line['lang'])
         else:
@@ -73,7 +69,7 @@ for line in data:
 
         line_to_db.append(0)
 
-        #загрузка в БД
+        # загрузка в БД
         cur.execute('INSERT INTO tweets_db '
                     '(name, tweet_text, country_code, display_url, lang, created_at, location, tweet_sentiment)'
                     'VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
