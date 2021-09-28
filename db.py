@@ -17,8 +17,6 @@ for line in data:
     if 'delete' not in line.keys():
         line_to_db = []
 
-        line_to_db.append(line['id'])
-
         if line['user']:
             if line['user']['name']:
                 line_to_db.append(line['user']['name'])
@@ -76,9 +74,9 @@ for line in data:
         line_to_db.append(0)
 
         #загрузка в БД
-        cur.execute('INSERT INTO tweets_test3 '
-                    '(id, name, tweet_text, country_code, display_url, lang, created_at, location, tweet_sentiment)'
-                    'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        cur.execute('INSERT INTO tweets_db '
+                    '(name, tweet_text, country_code, display_url, lang, created_at, location, tweet_sentiment)'
+                    'VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                     line_to_db)
 
 con.commit()
