@@ -40,12 +40,12 @@ def sentiment_count(st, lex):
     return score
 
 
-for row in cur.execute('SELECT tweet_text FROM tweets_db'):
+for row in cur.execute('SELECT tweet_text FROM tweets_db_normalized'):
     s = clear_str(row[0])
     tweet_sentiments[row[0]] = sentiment_count(s, lexicon)
 
 for row in tweet_sentiments:
-    cur.execute('UPDATE tweets_db '
+    cur.execute('UPDATE tweets_db_normalized '
                 'SET tweet_sentiment = (?) '
                 'WHERE tweet_text = (?)',
                 (tweet_sentiments[row], row))
