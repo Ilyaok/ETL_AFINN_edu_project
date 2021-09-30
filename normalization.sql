@@ -43,7 +43,7 @@ CREATE TABLE locations (
     id        INTEGER  PRIMARY KEY AUTOINCREMENT,
     name            VARCHAR,
     location        VARCHAR,
-    FOREIGN KEY (id) REFERENCES tweets_db(id)
+    FOREIGN KEY (id) REFERENCES tweets_db_normalized(id)
 );
 
 INSERT INTO locations (
@@ -61,7 +61,7 @@ INSERT INTO locations (
 PRAGMA foreign_keys = 0;
 
 CREATE TABLE sqlitestudio_temp_table AS SELECT *
-                                          FROM tweets_db;
+                                          FROM tweets_db_normalized;
 
 DROP TABLE tweets_db_normalized;
 
