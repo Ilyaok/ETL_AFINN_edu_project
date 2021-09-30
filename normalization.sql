@@ -2,15 +2,10 @@
 -- Поле location в json лежит в директории user, соответственно, зависит от поля name, поэтому выносим зависимость name-location в отдельную таблицу
 -- Остальные поля зависят напрямую от id твита, поэтому не подлежат нормализации
 
--- Добавление id твита
-PRAGMA foreign_keys = 0;
 
-CREATE TABLE sqlitestudio_temp_table AS SELECT *
-                                          FROM tweets_db;
 
-DROP TABLE tweets_db;
-
-CREATE TABLE tweets_db (
+-- Создание нормализованной таблицы
+CREATE TABLE tweets_db_normalized (
     id        INTEGER  PRIMARY KEY AUTOINCREMENT,
     name            VARCHAR,
     tweet_text      VARCHAR,
@@ -22,7 +17,7 @@ CREATE TABLE tweets_db (
     tweet_sentiment INT      DEFAULT (0) 
 );
 
-INSERT INTO tweets_db (
+INSERT INTO tweets_db_normalized (
                           name,
                           tweet_text,
                           country_code,
@@ -40,14 +35,10 @@ INSERT INTO tweets_db (
                              created_at,
                              location,
                              tweet_sentiment
-                        FROM sqlitestudio_temp_table;
-
-DROP TABLE sqlitestudio_temp_table;
-
-PRAGMA foreign_keys = 1;
+                        FROM tweets_db;
 
 
--- Создание таблицы locations и внесение в нее данных
+-- Создание таблицы locations
 CREATE TABLE locations (
     id        INTEGER  PRIMARY KEY AUTOINCREMENT,
     name            VARCHAR,
@@ -63,18 +54,18 @@ INSERT INTO locations (
                       SELECT id,
                              name, 
                              location
-                        FROM tweets_db;
-                        
+                        FROM tweets_db_normalized;
 
--- Удаление поля location из таблицы tweets_db
+
+-- Удаление поля location из нормализованной таблицы
 PRAGMA foreign_keys = 0;
 
 CREATE TABLE sqlitestudio_temp_table AS SELECT *
                                           FROM tweets_db;
 
-DROP TABLE tweets_db;
+DROP TABLE tweets_db_normalized;
 
-CREATE TABLE tweets_db (
+CREATE TABLE tweets_db_normalized (
     id        INTEGER  PRIMARY KEY AUTOINCREMENT,
     name            VARCHAR,
     tweet_text      VARCHAR,
@@ -85,7 +76,7 @@ CREATE TABLE tweets_db (
     tweet_sentiment INT      DEFAULT (0) 
 );
 
-INSERT INTO tweets_db (
+INSERT INTO tweets_db_normalized (
                           id,
                           name,
                           tweet_text,
