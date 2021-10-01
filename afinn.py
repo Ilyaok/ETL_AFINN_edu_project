@@ -4,6 +4,7 @@
 
 import sqlite3
 
+# Создание словаря из файла AFINN-111.txt
 lexicon = {}
 with open('AFINN-111.txt') as f:
     for line in f:
@@ -16,13 +17,12 @@ tweet_sentiments = {}
 
 
 # Перевод строки в нижний регистр и оставление в ней только буквенных символов
-# todo проверить и добавить обработку ключей, состоящих из двух слов (самое важное)
 # todo добавить обработку случаев "abc,efgh', 'abcd!', ссылок 'http://' и др.
 # todo перепроверить пробелы и табуляции, а также другие символы разделения
 # todo оптимизировать работу с twitter-никами
-def clear_str(input):
+def clear_str(s_input):
     valids = []
-    s = input.lower().strip()
+    s = s_input.lower().strip()
     for c in s:
         if c.isalpha() or c == ' ' or c == '_' or c == '@':
             valids.append(c)
@@ -40,6 +40,7 @@ def sentiment_count(st, lex):
     return score
 
 
+# Расчет эмоциональной окраски сообщения
 for row in cur.execute('SELECT tweet_text FROM tweets_db_normalized'):
     s = clear_str(row[0])
     tweet_sentiments[row[0]] = sentiment_count(s, lexicon)

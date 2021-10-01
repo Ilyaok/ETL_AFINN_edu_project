@@ -1,14 +1,39 @@
+# Аргументы командной строки при запуске скрипта: путь к файлу json, путь к файлу БД
+# Если аргумент не задан, предполагается, что файлы находятся в той же директории, что и запускаемый скрипт
+
 import sqlite3
 import json
+import argparse
+import pathlib
+
+
+# Создание аргументов командной строки.
+# Использование библиотеки Pathlib делает скрипт переносимым (независимым от ОС)
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '-json_dir',
+    type=str,
+    default=pathlib.Path().cwd() / 'three_minutes_tweets.json',
+    help='dir for json, default - current directory'
+)
+
+parser.add_argument(
+    '-DB_dir',
+    type=str,
+    default=pathlib.Path().cwd() / 'tweets.db',
+    help='dir for DB-file, default - current directory'
+)
+args = parser.parse_args()
 
 data = []
-with open('three_minutes_tweets.json') as f:
+with open(args.json_dir) as f:
     for line in f:
         data.append(json.loads(line))
 
-con = sqlite3.connect('tweets.db')
+con = sqlite3.connect(args.DB_dir)
 cur = con.cursor()
 
+# Создание строки из json-файла для загрузки в БД
 # todo оптимизировать ситуацию с else (в т.ч. проверить вложенные if)
 for line in data:
     if 'delete' not in line.keys():
@@ -69,7 +94,7 @@ for line in data:
 
         line_to_db.append(0)
 
-        # загрузка в БД
+        # загрузка очередной строки данных в БД
         cur.execute('INSERT INTO tweets_db '
                     '(name, tweet_text, country_code, display_url, lang, created_at, location, tweet_sentiment)'
                     'VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
