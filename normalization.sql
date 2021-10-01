@@ -3,7 +3,6 @@
 -- Остальные поля зависят напрямую от id твита, поэтому не подлежат нормализации
 
 
-
 -- Создание нормализованной таблицы
 CREATE TABLE IF NOT EXISTS tweets_db_normalized (
     id        INTEGER  PRIMARY KEY AUTOINCREMENT,
