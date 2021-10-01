@@ -5,7 +5,7 @@
 
 
 -- Создание нормализованной таблицы
-CREATE TABLE tweets_db_normalized (
+CREATE TABLE IF NOT EXISTS tweets_db_normalized (
     id        INTEGER  PRIMARY KEY AUTOINCREMENT,
     name            VARCHAR,
     tweet_text      VARCHAR,
@@ -39,7 +39,7 @@ INSERT INTO tweets_db_normalized (
 
 
 -- Создание таблицы locations
-CREATE TABLE locations (
+CREATE TABLE IF NOT EXISTS locations (
     id        INTEGER  PRIMARY KEY AUTOINCREMENT,
     name            VARCHAR,
     location        VARCHAR,
