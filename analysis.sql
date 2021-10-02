@@ -1,88 +1,121 @@
--- Наиболее счастливые страны (по коду страны), локация и пользователь, общая таблица
-SELECT country_code Most_happy_country,
-       location Most_happy_location,
-       name Most_happy_user,
-       tweet_text Most_happy_tweet,
-       tweet_sentiment AFINN_sentiment
-  FROM tweets_db_normalized tbn
-       JOIN
-       locations l ON tbn.id = l.id
- WHERE tweet_sentiment = (
-                             SELECT MAX(tweet_sentiment) 
-                               FROM tweets_db_normalized
-                         );
+-- Наиболее счастливые страны
+WITH avg_sentiments AS (
+    SELECT DISTINCT country_code,
+                    AVG(tweet_sentiment) OVER (PARTITION BY country_code) AVG_Hapiness
+      FROM tweets_db_normalized
+     WHERE country_code IS NOT NULL
+)
+SELECT country_code,
+       AVG_Hapiness
+  FROM avg_sentiments
+ WHERE AVG_Hapiness = (
+                          SELECT MAX(AVG_Hapiness) 
+                            FROM avg_sentiments
+                      );
 
 
--- Наименее счастливые страны (по коду страны), локация и пользователь, общая таблица
-SELECT country_code Least_happy_country,
-       location Least_happy_location,
-       name Least_happy_user,
-       tweet_text Least_happy_tweet,
-       tweet_sentiment AFINN_sentiment
-  FROM tweets_db_normalized tbn
-       JOIN
-       locations l ON tbn.id = l.id
- WHERE tweet_sentiment = (
-                             SELECT MIN(tweet_sentiment) 
-                               FROM tweets_db_normalized
-                         );
+    
+
+-- Наименее счастливые страны
+WITH avg_sentiments AS (
+    SELECT DISTINCT country_code,
+                    AVG(tweet_sentiment) OVER (PARTITION BY country_code) AVG_Hapiness
+      FROM tweets_db_normalized
+     WHERE country_code IS NOT NULL
+)
+SELECT country_code,
+       AVG_Hapiness
+  FROM avg_sentiments
+ WHERE AVG_Hapiness = (
+                          SELECT MIN(AVG_Hapiness) 
+                            FROM avg_sentiments
+                      );
 
 
--- Наиболее счастливая локация
+
+-- Наиболее счастливые локации
+WITH avg_sentiments AS (
+    SELECT DISTINCT location,
+                    AVG(tweet_sentiment) OVER (PARTITION BY location) AVG_Hapiness
+      FROM tweets_db_normalized tbn
+           JOIN
+           locations l ON tbn.id = l.id
+     WHERE location IS NOT NULL
+)
 SELECT location,
-       tweet_sentiment
-  FROM tweets_db_normalized tbn
-       JOIN
-       locations l ON tbn.id = l.id
- WHERE tweet_sentiment = (
-                             SELECT MAX(tweet_sentiment) 
-                               FROM tweets_db_normalized
-                         )
-AND 
-       location IS NOT NULL
- ORDER BY location;
+       AVG_Hapiness
+  FROM avg_sentiments
+ WHERE AVG_Hapiness = (
+                          SELECT MAX(AVG_Hapiness) 
+                            FROM avg_sentiments
+                      );
 
- 
--- Наименнее счастливая локация
+
+
+-- Наименнее счастливые локации
+WITH avg_sentiments AS (
+    SELECT DISTINCT location,
+                    AVG(tweet_sentiment) OVER (PARTITION BY location) AVG_Hapiness
+      FROM tweets_db_normalized tbn
+           JOIN
+           locations l ON tbn.id = l.id
+     WHERE location IS NOT NULL
+)
 SELECT location,
-       tweet_sentiment
-  FROM tweets_db_normalized tbn
-       JOIN
-       locations l ON tbn.id = l.id
- WHERE tweet_sentiment = (
-                             SELECT MIN(tweet_sentiment) 
-                               FROM tweets_db_normalized
-                         )
-AND 
-       location IS NOT NULL
- ORDER BY location;
+       AVG_Hapiness
+  FROM avg_sentiments
+ WHERE AVG_Hapiness = (
+                          SELECT MIN(AVG_Hapiness) 
+                            FROM avg_sentiments
+                      );
 
 
 
 -- Наиболее счастливые пользователи
+WITH avg_sentiments AS (
+    SELECT DISTINCT name,
+                    tweet_text,
+                    AVG(tweet_sentiment) OVER (PARTITION BY name) AVG_Hapiness
+      FROM tweets_db_normalized
+     WHERE name IS NOT NULL
+)
 SELECT name,
        tweet_text,
-       tweet_sentiment
-  FROM tweets_db_normalized
- WHERE tweet_sentiment = (
-                             SELECT MAX(tweet_sentiment) 
-                               FROM tweets_db_normalized
-                         )
-AND 
-       name IS NOT NULL
- ORDER BY name;
+       AVG_Hapiness
+  FROM avg_sentiments
+ WHERE AVG_Hapiness = (
+                          SELECT MAX(AVG_Hapiness) 
+                            FROM avg_sentiments
+                      );
+
 
 
 -- Наименнее счастливые пользователи
+WITH avg_sentiments AS (
+    SELECT DISTINCT name,
+                    tweet_text,
+                    AVG(tweet_sentiment) OVER (PARTITION BY name) AVG_Hapiness
+      FROM tweets_db_normalized
+     WHERE name IS NOT NULL
+)
 SELECT name,
        tweet_text,
-       tweet_sentiment
-  FROM tweets_db_normalized
- WHERE tweet_sentiment = (
-                             SELECT MIN(tweet_sentiment) 
-                               FROM tweets_db_normalized
-                         )
-AND 
-       name IS NOT NULL
- ORDER BY name;
+       AVG_Hapiness
+  FROM avg_sentiments
+ WHERE AVG_Hapiness = (
+                          SELECT MIN(AVG_Hapiness) 
+                            FROM avg_sentiments
+                      );
+
+ 
+       
+
+
+     
+
+
+
+
+
+
 
