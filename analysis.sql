@@ -11,10 +11,7 @@ SELECT country_code,
  WHERE AVG_Hapiness = (
                           SELECT MAX(AVG_Hapiness) 
                             FROM avg_sentiments
-                      );
-
-
-    
+                      ); 
 
 -- Наименее счастливые страны
 WITH avg_sentiments AS (
@@ -30,8 +27,6 @@ SELECT country_code,
                           SELECT MIN(AVG_Hapiness) 
                             FROM avg_sentiments
                       );
-
-
 
 -- Наиболее счастливые локации
 WITH avg_sentiments AS (
@@ -50,8 +45,6 @@ SELECT location,
                             FROM avg_sentiments
                       );
 
-
-
 -- Наименнее счастливые локации
 WITH avg_sentiments AS (
     SELECT DISTINCT location,
@@ -68,8 +61,6 @@ SELECT location,
                           SELECT MIN(AVG_Hapiness) 
                             FROM avg_sentiments
                       );
-
-
 
 -- Наиболее счастливые пользователи
 WITH avg_sentiments AS (
@@ -88,8 +79,6 @@ SELECT name,
                             FROM avg_sentiments
                       );
 
-
-
 -- Наименнее счастливые пользователи
 WITH avg_sentiments AS (
     SELECT DISTINCT name,
@@ -106,8 +95,6 @@ SELECT name,
                           SELECT MIN(AVG_Hapiness) 
                             FROM avg_sentiments
                       );
-
- 
        
 
 
