@@ -11,39 +11,57 @@ class SentimentCount:
         self.afinn_path = afinn_path
         self.db_path = db_path
         self.valids = []
-        self.lexicon = {}
         self.score = 0
         self.st = []
         self.tweet_sentiments = {}
 
-    # Перевод строки в нижний регистр и оставление в ней только буквенных символов
+        # Создание словаря из файла AFINN-111.txt
+        self.lexicon = {}
+        with open(self.afinn_path) as f:
+            for line in f:
+                self.lexicon[' '.join(line.split()[:-1])] = int(line.split()[-1])
+
+    # Подготовка строки к анализу AFINN (очистка)
     # todo добавить обработку случаев "abc,efgh', 'abcd!', ссылок 'http://' и др.
     # todo перепроверить пробелы и табуляции, а также другие символы разделения
-    # todo оптимизировать работу с twitter-никами
+    # todo оптимизировать работу с twitter-никами (не считаем их словами)
     def clear_str(self, st):
         self.st = st.lower().strip()
         self.valids = []
+        space_chars = [' ', '\t', '\n']
         for c in self.st:
-            if c.isalpha() or c == ' ' or c == '_' or c == '@':
+            if c.isalpha():
                 self.valids.append(c)
+            if c in space_chars and len(self.valids) != 0 and self.valids[-1] != ' ':
+                self.valids.append(' ')
         return ''.join(self.valids)
 
     # Расчет эмоциональной оценки для очищенной строки
     def sentiment_count(self, st):
         self.score = 0
-        for c in st.split():
-            if c in self.lexicon:
-                self.score += self.lexicon[c]
+        l = st.split()
+        i = 0
+        while i < len(l):
+            f = 0
+            if i == len(l) - 1:
+                if l[i] in self.lexicon:
+                    self.score += self.lexicon[l[i]]
+                break
+            for j in range(len(l)-1, i-1, -1):
+                candidate = ' '.join(l[i:j+1])
+                if candidate in self.lexicon:
+                    self.score += self.lexicon[candidate]
+                    i += len(candidate.split())
+                    f = 1
+                    break
+            if f == 0:
+                i += 1
         return self.score
 
     # Расчет эмоциональной окраски сообщения для каждой строки
     # Занесение оценки эмоциональной окраски сообщения в БД
+    # todo покрыть исключениями работу с БД
     def sentiment_count_to_db(self):
-        # Создание словаря из файла AFINN-111.txt
-        with open(self.afinn_path) as f:
-            for line in f:
-                self.lexicon[' '.join(line.split()[:-1])] = int(line.split()[-1])
-
         con = sqlite3.connect(self.db_path)
         cur = con.cursor()
 
