@@ -42,8 +42,6 @@ AND
        location IS NOT NULL
  ORDER BY location;
 
-
-
  
 -- Наименнее счастливая локация
 SELECT location,
