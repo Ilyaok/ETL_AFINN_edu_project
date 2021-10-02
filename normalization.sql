@@ -2,7 +2,6 @@
 -- Поле location в json лежит в директории user, соответственно, зависит от поля name, поэтому выносим зависимость name-location в отдельную таблицу
 -- Остальные поля зависят напрямую от id твита, поэтому не подлежат нормализации
 
-
 -- Создание нормализованной таблицы
 CREATE TABLE IF NOT EXISTS tweets_db_normalized (
     id        INTEGER  PRIMARY KEY AUTOINCREMENT,
@@ -36,7 +35,6 @@ INSERT INTO tweets_db_normalized (
                              tweet_sentiment
                         FROM tweets_db;
 
-
 -- Создание таблицы locations
 CREATE TABLE IF NOT EXISTS locations (
     id        INTEGER  PRIMARY KEY AUTOINCREMENT,
@@ -54,7 +52,6 @@ INSERT INTO locations (
                              name, 
                              location
                         FROM tweets_db_normalized;
-
 
 -- Удаление поля location из нормализованной таблицы
 PRAGMA foreign_keys = 0;
