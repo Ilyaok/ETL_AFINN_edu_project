@@ -3,10 +3,11 @@
 # Исходя из формулировки задания принято решение написать скрипт на основе AFINN самостоятельно
 
 import sqlite3
+import sys
+from unicodedata import category
 
 
 class SentimentCount:
-
     def __init__(self, afinn_path, db_path):
         self.afinn_path = afinn_path
         self.db_path = db_path
@@ -21,20 +22,26 @@ class SentimentCount:
             for line in f:
                 self.lexicon[' '.join(line.split()[:-1])] = int(line.split()[-1])
 
+        # Создание словаря знаков препинания из таблицы Unicode
+        self.codepoints = range(sys.maxunicode + 1)
+        self.punctuation = {c for i in self.codepoints if category(c := chr(i)).startswith("P")}
+        self.punctuation.update({' ', '\n', '\t'})
+        self.punctuation.remove('@')
+        self.punctuation.remove("'")
+
     # Подготовка строки к анализу AFINN (очистка)
-    # todo добавить обработку случаев "abc,efgh', 'abcd!', ссылок 'http://' и др.
-    # todo перепроверить пробелы и табуляции, а также другие символы разделения
-    # todo оптимизировать работу с twitter-никами (не считаем их словами)
     def clear_str(self, st):
         self.st = st.lower().strip()
         self.valids = []
-        space_chars = [' ', '\t', '\n']
-        for c in self.st:
-            if c.isalpha():
-                self.valids.append(c)
-            if c in space_chars and len(self.valids) != 0 and self.valids[-1] != ' ':
+        for i in range(len(self.st)):
+            if self.st[i].isalpha() or (
+                    self.st[i] == '@' and i != len(self.st) - 1 and self.st[i + 1] not in self.punctuation) \
+                    or (self.st[i] == "'" and i != len(self.st) - 1 and self.st[i + 1] not in self.punctuation):
+                self.valids.append(self.st[i])
+            if self.st[i] in self.punctuation and len(self.valids) != 0 and self.valids[-1] != ' ' and i != len(
+                    self.st) - 1:
                 self.valids.append(' ')
-        return ''.join(self.valids)
+        return ''.join(self.valids).strip()
 
     # Расчет эмоциональной оценки для очищенной строки
     def sentiment_count(self, st):
@@ -47,8 +54,8 @@ class SentimentCount:
                 if l[i] in self.lexicon:
                     self.score += self.lexicon[l[i]]
                 break
-            for j in range(len(l)-1, i-1, -1):
-                candidate = ' '.join(l[i:j+1])
+            for j in range(len(l) - 1, i - 1, -1):
+                candidate = ' '.join(l[i:j + 1])
                 if candidate in self.lexicon:
                     self.score += self.lexicon[candidate]
                     i += len(candidate.split())
@@ -60,7 +67,6 @@ class SentimentCount:
 
     # Расчет эмоциональной окраски сообщения для каждой строки
     # Занесение оценки эмоциональной окраски сообщения в БД
-    # todo покрыть исключениями работу с БД
     def sentiment_count_to_db(self):
         con = sqlite3.connect(self.db_path)
         cur = con.cursor()

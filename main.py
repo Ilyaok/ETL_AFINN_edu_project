@@ -6,7 +6,7 @@ import json
 import argparse
 import pathlib
 
-# todo покрыть исключениями работу с БД
+
 class DBLoad:
 
     def __init__(self, json_dir, DB_dir):
@@ -23,8 +23,6 @@ class DBLoad:
         cur = con.cursor()
 
         # Создание строки из json-файла для загрузки в БД
-        # todo оптимизировать ситуацию с else (в т.ч. проверить вложенные if)
-        # todo решить в целом, что делать с NULL-ами в SQL-скрипте
         for line in self.data:
             if 'delete' not in line.keys():
                 line_to_db = []
