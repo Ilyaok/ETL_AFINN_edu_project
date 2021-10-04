@@ -1,28 +1,34 @@
-# Аргументы командной строки при запуске скрипта: путь к файлу json, путь к файлу БД
-# Если аргумент не задан, предполагается, что файлы находятся в той же директории, что и запускаемый скрипт
+# Пример запуска из CLI:
+# 'python main.py -json_dir C:\sqllite\three_minutes_tweets.json -db_dir C:\sqllite\tweets.db'
+
+# Аргументы командной строки при запуске скрипта:
+# json_dir - путь к файлу json (если не задан, файл берется из текущей директории)
+# db_dir - путь к файлу БД (если не задан, файл берется из текущей директории)
 
 import sqlite3
 import json
 import argparse
 import pathlib
 
-
+# todo покрыть исключениями работу с БД
 class DBLoad:
 
-    def __init__(self, json_dir, DB_dir):
+    def __init__(self, json_dir, db_dir):
         self.data = []
         self.json_dir = json_dir
-        self.DB_dir = DB_dir
+        self.db_dir = db_dir
 
     def json_to_db(self):
         with open(self.json_dir) as f:
             for line in f:
                 self.data.append(json.loads(line))
 
-        con = sqlite3.connect(self.DB_dir)
+        con = sqlite3.connect(self.db_dir)
         cur = con.cursor()
 
         # Создание строки из json-файла для загрузки в БД
+        # todo оптимизировать ситуацию с else (в т.ч. проверить вложенные if)
+        # todo решить в целом, что делать с NULL-ами в SQL-скрипте
         for line in self.data:
             if 'delete' not in line.keys():
                 line_to_db = []
@@ -99,17 +105,17 @@ if __name__ == '__main__':
         '-json_dir',
         type=str,
         default=pathlib.Path().cwd() / 'three_minutes_tweets.json',
-        help='dir for json, default - current directory'
+        help='directory for json, default - current directory'
     )
 
     parser.add_argument(
-        '-DB_dir',
+        '-db_dir',
         type=str,
         default=pathlib.Path().cwd() / 'tweets.db',
-        help='dir for DB-file, default - current directory'
+        help='directory for DB-file, default - current directory'
     )
     args = parser.parse_args()
 
     # Создание экземляра класса Загрузки и загрузка данных в БД
-    dbl = DBLoad(args.json_dir, args.DB_dir)
+    dbl = DBLoad(args.json_dir, args.db_dir)
     dbl.json_to_db()
