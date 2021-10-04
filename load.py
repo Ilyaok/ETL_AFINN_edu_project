@@ -1,5 +1,5 @@
 # Пример запуска из CLI:
-# 'python main.py -json_dir C:\sqllite\three_minutes_tweets.json -db_dir C:\sqllite\tweets.db'
+# 'python load.py -json_dir C:\sqllite\three_minutes_tweets.json -db_dir C:\sqllite\tweets.db'
 
 # Аргументы командной строки при запуске скрипта:
 # json_dir - путь к файлу json (если не задан, файл берется из текущей директории)
@@ -98,24 +98,23 @@ class DBLoad:
         con.close()
 
 
-if __name__ == '__main__':
-    # Возможность задать путь к json-файлу и файлу БД через аргументы командной строки
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-json_dir',
-        type=str,
-        default=pathlib.Path().cwd() / 'three_minutes_tweets.json',
-        help='directory for json, default - current directory'
-    )
+# Возможность задать путь к json-файлу и файлу БД через аргументы командной строки
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '-json_dir',
+    type=str,
+    default=pathlib.Path().cwd() / 'three_minutes_tweets.json',
+    help='directory for json, default - current directory'
+)
 
-    parser.add_argument(
-        '-db_dir',
-        type=str,
-        default=pathlib.Path().cwd() / 'tweets.db',
-        help='directory for DB-file, default - current directory'
-    )
-    args = parser.parse_args()
+parser.add_argument(
+    '-db_dir',
+    type=str,
+    default=pathlib.Path().cwd() / 'tweets.db',
+    help='directory for DB-file, default - current directory'
+)
+args = parser.parse_args()
 
-    # Создание экземляра класса Загрузки и загрузка данных в БД
-    dbl = DBLoad(args.json_dir, args.db_dir)
-    dbl.json_to_db()
+# Создание экземляра класса Загрузки и загрузка данных в БД
+dbl = DBLoad(args.json_dir, args.db_dir)
+dbl.json_to_db()
