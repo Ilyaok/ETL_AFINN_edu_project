@@ -35,32 +35,21 @@ class DBLoad:
 
             line_to_db = [None] * len(self.tweet_structure)
 
-            if line['user']:
-                if line['user']['name']:
-                    line_to_db[0] = line['user']['name']
+            if line['user'] and line['user']['name']: line_to_db[0] = line['user']['name']
 
-            if line['text']:
-                line_to_db[1] = line['text']
+            if line['text']: line_to_db[1] = line['text']
 
-            if line['place']:
-                if line['place']['country_code']:
-                    line_to_db[2] = line['place']['country_code']
+            if line['place'] and line['place']['country_code']:
+                line_to_db[2] = line['place']['country_code']
 
-            if line['entities']:
-                if line['entities']['urls']:
-                    if line['entities']['urls'][0]:
-                        if line['entities']['urls'][0]['display_url']:
-                            line_to_db[3] = line['entities']['urls'][0]['display_url']
+            if line['entities'] and line['entities']['urls'] and line['entities']['urls'][0] and line['entities']['urls'][0]['display_url']:
+                line_to_db[3] = line['entities']['urls'][0]['display_url']
 
-            if line['lang']:
-                line_to_db[4] = line['lang']
+            if line['lang']: line_to_db[4] = line['lang']
 
-            if line['created_at']:
-                line_to_db[5] = line['created_at']
+            if line['created_at']: line_to_db[5] = line['created_at']
 
-            if line['user']:
-                if line['user']['location']:
-                    line_to_db[6] = line['user']['location']
+            if line['user'] and line['user']['location']: line_to_db[6] = line['user']['location']
 
             line_to_db[7] = 0
 
